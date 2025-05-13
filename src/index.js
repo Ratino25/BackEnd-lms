@@ -6,6 +6,7 @@ import bodyParser from "body-parser"
 import globalRoutes from "./routes/globalRoutes.js"
 import authRoutes from "./routes/authRoutes.js"
 import connectDB from "./utils/database.js"
+import paymentRoutes from "./routes/paymentRoutes.js"
 
 const app = express()
 
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api", globalRoutes)
+app.use("/api", paymentRoutes)
 app.use("/api", authRoutes)
 
 app.listen(port, () => {

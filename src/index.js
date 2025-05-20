@@ -7,6 +7,7 @@ import globalRoutes from "./routes/globalRoutes.js"
 import authRoutes from "./routes/authRoutes.js"
 import connectDB from "./utils/database.js"
 import paymentRoutes from "./routes/paymentRoutes.js"
+import courseRoute from "./routes/courseRoute.js"
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 app.use("/api", globalRoutes)
 app.use("/api", paymentRoutes)
 app.use("/api", authRoutes)
+app.use('/api', courseRoute)
 
 app.listen(port, () => {
     console.log('Express App listening on port 3000')

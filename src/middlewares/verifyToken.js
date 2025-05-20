@@ -1,38 +1,41 @@
 import jwt from 'jsonwebtoken'
-import userModel from '../models/userModel'
+import userModel from '../models/userModel.js'
 
-export const verifyToken = async(req, res, next) => {
-    const secretKey = process.env.JWT_SECRET_KEY ?? ""
+export const verifyToken = async (req, res, next) => {
+  const secretKey = process.env.SECRET_KEY_JWT ?? "";
 
-    if(req?.header?.authorization?.split(' ')[0] === "JWT"){
-        const decode = jwt.verify(
-            req?.header?.authorization?.split(' ')[1],
-            secretKey
-        )
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
 
-        const user = await userModel.findById(
-            decode.data.id,
-            "_id name email role"
-        )
+  const [scheme, token] = authHeader.split(' ');
 
-        if(!user){
-            return res.status(400).json({
-                message: "Token expirired"
-            })
-        }
+  if (scheme !== "JWT" || !token) {
+    return res.status(401).json({ message: "Invalid authorization format" });
+  }
 
-        req.user = {
-            _id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            role: user.role
-        }
+  try {
+    const decoded = jwt.verify(token, secretKey);
 
-        next()
-    } else {
-        return res.status(400).json({
-            message: "Unauthorized"
-        })
+    const user = await userModel.findById(
+      decoded.data.id,
+      "_id name email role"
+    );
+
+    if (!user) {
+      return res.status(401).json({ message: "Token expired or user not found" });
     }
 
-}
+    req.user = {
+      _id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};

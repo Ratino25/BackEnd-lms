@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
 const courseModel = mongoose.Schema({
-    name: {type: String, required: true},
-    thumbnail: {
+    name: { type: String, required: true },
+    thumbnail: {type: String, required: true },
+    tagline: { type: String, required: true },
+    description: { type: String, required: true },
+    category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category'
     },
-    tagline: {type: String, required: true},
-    desctiption: {type: String, required: true},
     students: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

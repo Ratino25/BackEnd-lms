@@ -36,6 +36,9 @@ export const getCourse = async (req, res) => {
 export const postCourse = async (req, res) => {
     try {
         const body = req.body
+        // console.log(body)
+
+        console.log(req.file)
 
         const parse = mutateCourseSchema.safeParse(body)
 
@@ -53,6 +56,8 @@ export const postCourse = async (req, res) => {
         }
 
         const category = await categoryModel.findById(parse.data.categoryId)
+        console.log(category)
+
 
         if (!category) {
             return res.status(500).json({

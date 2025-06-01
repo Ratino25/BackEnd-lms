@@ -21,9 +21,19 @@ export const getCourse = async (req, res) => {
                 select: 'name'
             })
 
+        const imageUrl = process.env.APP_URL + '/uploads/courses/'
+
+        const response = courses.map((item) => {
+            return {
+                ...item.toObject(),
+                thumbnail_url: imageUrl + item.thumbnail,
+                total_students : item.students.length
+            }
+        })
+
         return res.json({
             message: 'Get Courses Success',
-            data: courses
+            data: response
         })
     } catch (error) {
         console.log(error)

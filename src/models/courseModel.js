@@ -9,10 +9,10 @@ const courseModel = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category'
     },
-    students: {
+    students: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    },
+    }],
     manager: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

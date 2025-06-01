@@ -160,3 +160,29 @@ export const updateCourse = async (req, res) => {
         })
     }
 }
+
+export const deleteCourse = async (req, res) => {
+    try {
+        const {id} = req.params
+
+        const course = await courseModel.findById(id)
+
+        const filePath = path.join(__dirname, '..', "..", "public/uploads/courses", course.thumbnail)
+
+        if(fs.existsSync(filePath)){
+            fs.unlinkSync(fil)
+        }
+
+        await courseModel.findByIdAndDelete(id)
+
+        return res.json({
+            message: 'Delete Course Success'
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: "Internal Server Error"
+        })
+        
+    }
+}

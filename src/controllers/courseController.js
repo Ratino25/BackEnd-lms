@@ -3,6 +3,8 @@ import fs from 'fs'
 import { mutateCourseSchema } from "../utils/schema.js";
 import categoryModel from "../models/categoryModel.js";
 import userModel from "../models/userModel.js";
+import path from "path";
+
 
 
 
@@ -88,7 +90,8 @@ export const postCourse = async (req, res) => {
 
         await categoryModel.findByIdAndUpdate(category._id, {
             $push: {
-                course: course._id
+                // course: course._id
+                courses: course._id
             },
             
         }, {new: true})
@@ -164,13 +167,16 @@ export const updateCourse = async (req, res) => {
 export const deleteCourse = async (req, res) => {
     try {
         const {id} = req.params
+        console.log(id)
 
         const course = await courseModel.findById(id)
 
-        const filePath = path.join(__dirname, '..', "..", "public/uploads/courses", course.thumbnail)
+        const dirName = path.resolve()
+
+        const filePath = path.join(dirName, "public/uploads/courses", course.thumbnail)
 
         if(fs.existsSync(filePath)){
-            fs.unlinkSync(fil)
+            fs.unlinkSync(filePath)
         }
 
         await courseModel.findByIdAndDelete(id)

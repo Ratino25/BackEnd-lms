@@ -14,7 +14,7 @@ const upload = multer({
 courseRoute.get('/courses', verifyToken,  getCourse)
 courseRoute.post('/courses', verifyToken, upload.single('thumbnail'), postCourse)
 courseRoute.put('/courses/:id', verifyToken, upload.single('thumbnail'), updateCourse)
-courseRoute.delete( '/courses/:id', verifyToken, deleteCourse)
+courseRoute.delete('/courses/:id', verifyToken, deleteCourse)
 
 
 export default courseRoute

@@ -29,7 +29,7 @@ export const getCourse = async (req, res) => {
             return {
                 ...item.toObject(),
                 thumbnail_url: imageUrl + item.thumbnail,
-                total_students : item.students.length
+                total_students: item.students.length
             }
         })
 
@@ -52,6 +52,24 @@ export const getCategories = async (req, res) => {
         return res.json({
             message: "Get Category Success",
             data: categories
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
+
+export const getCourseById = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const course = await courseModel.findById(id)
+
+        return res.json({
+            message: "Get Course Detail Success",
+            data: course
         })
     } catch (error) {
         console.log(error)
@@ -109,16 +127,16 @@ export const postCourse = async (req, res) => {
                 // course: course._id
                 courses: course._id
             },
-            
-        }, {new: true})
+
+        }, { new: true })
 
         await userModel.findByIdAndUpdate(req.user?._id, {
             $push: {
                 courses: course._id
             }
-        }, {new: true})
+        }, { new: true })
 
-        return res.json({message: 'Create Course Success'})
+        return res.json({ message: 'Create Course Success' })
 
     } catch (error) {
         console.log(error)
@@ -170,7 +188,7 @@ export const updateCourse = async (req, res) => {
             }
         )
 
-        return res.json({message: 'Update Course Success'})
+        return res.json({ message: 'Update Course Success' })
 
     } catch (error) {
         console.log(error)
@@ -182,7 +200,7 @@ export const updateCourse = async (req, res) => {
 
 export const deleteCourse = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         console.log(id)
 
         const course = await courseModel.findById(id)
@@ -191,7 +209,7 @@ export const deleteCourse = async (req, res) => {
 
         const filePath = path.join(dirName, "public/uploads/courses", course.thumbnail)
 
-        if(fs.existsSync(filePath)){
+        if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath)
         }
 
@@ -205,6 +223,6 @@ export const deleteCourse = async (req, res) => {
         return res.status(500).json({
             message: "Internal Server Error"
         })
-        
+
     }
 }

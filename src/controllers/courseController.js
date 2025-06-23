@@ -4,6 +4,7 @@ import { mutateCourseSchema } from "../utils/schema.js";
 import categoryModel from "../models/categoryModel.js";
 import userModel from "../models/userModel.js";
 import path from "path";
+import courseDetailModel from "../models/courseDetailModel.js";
 
 
 
@@ -224,5 +225,33 @@ export const deleteCourse = async (req, res) => {
             message: "Internal Server Error"
         })
 
+    }
+}
+
+export const postContentCourse = async (req, res) => {
+    try {
+        const body = req.body
+        const course = await courseModel.findById(body.courseId)
+        const content = new courseDetailModel({
+            title: body.title,
+            type: body.type,
+            course: course._id,
+            text: body.text,
+            youtubeId: body.youtubeId
+        })
+        await content.save()
+
+        await courseModel.findByIdAndUpdate(course._id, {
+            $push: {
+                details: content._id
+            }
+        }, {new: true})
+
+        return res.json({message: 'Create content Success'})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: "Internal Server Error"
+        })
     }
 }

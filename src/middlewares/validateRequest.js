@@ -1,7 +1,7 @@
 import { ZodError } from "zod"
 
 export const validateRequest = (schema) => async (req, res, next) => {
-    try {
+    try {        
         schema.parse(req.body)
         next()
     } catch (error) {

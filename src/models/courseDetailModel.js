@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import courseModel from "./courseModel.js";
 
 const courseDetailModel = mongoose.Schema({
     title: {type: String, required: true},
@@ -14,5 +15,15 @@ const courseDetailModel = mongoose.Schema({
         ref: 'Course'
     }
 }, {timeStamps: true})
+
+courseDetailModel.post('findOneAndDelete', async (doc) => {
+    if(doc) {
+        await courseModel.findByIdAndUpdate(doc.course, {
+            $pull: {
+                details: doc._id
+            }
+        })
+    }
+})
 
 export default mongoose.model('CourseDetail', courseDetailModel)

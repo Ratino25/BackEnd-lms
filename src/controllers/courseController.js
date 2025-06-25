@@ -65,8 +65,12 @@ export const getCategories = async (req, res) => {
 export const getCourseById = async (req, res) => {
     try {
         const { id } = req.params
+        const {preview} = req.query
 
-        const course = await courseModel.findById(id).populate('details')
+        const course = await courseModel.findById(id).populate({
+            path: 'details',
+            select: preview === "true" ? "title type youtubeId text" : "title type"
+        })
 
         return res.json({
             message: "Get Course Detail Success",

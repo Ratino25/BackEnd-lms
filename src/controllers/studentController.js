@@ -1,6 +1,9 @@
 import userModel from "../models/userModel.js"
 import bcrypt from "bcrypt"
 import { mutateStudentSchema } from "../utils/schema.js"
+import courseModel from "../models/courseModel.js"
+import path from "path"
+import fs from "fs"
 
 export const getStudents = async (req, res) => {
     try {
@@ -124,5 +127,42 @@ export const updateStudent = async (req, res) => {
         return res.status(500).json({
             message: "Internal Server Error"
         })
+    }
+}
+
+export const deleteStudent = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const student = await userModel.findById(id);
+
+        await courseModel.findOneAndUpdate({
+            students: id
+        }, {
+            $pull: {
+                students: id
+            }
+        })
+
+        const dirName = path.resolve()
+
+        const filePath = path.join(dirName, "public/uploads/students", student.photo)
+
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath)
+        }
+
+        await userModel.findByIdAndDelete(id)
+        return res.json({
+            message: "Delete student successfully"
+        })
+
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+
     }
 }

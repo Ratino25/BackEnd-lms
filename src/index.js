@@ -9,6 +9,7 @@ import connectDB from "./utils/database.js"
 import paymentRoutes from "./routes/paymentRoutes.js"
 import courseRoute from "./routes/courseRoute.js"
 import studentRoutes from "./routes/studentRoutes.js"
+import overviewRoutes from "./models/overviewRoutes.js"
 
 const app = express()
 
@@ -31,6 +32,7 @@ app.use("/api", paymentRoutes)
 app.use("/api", authRoutes)
 app.use('/api', courseRoute)
 app.use('/api', studentRoutes)
+app.use("/api", overviewRoutes)
 
 app.listen(port, () => {
     console.log('Express App listening on port 3000')

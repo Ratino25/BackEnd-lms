@@ -5,7 +5,7 @@ import categoryModel from "../models/categoryModel.js";
 import userModel from "../models/userModel.js";
 import path from "path";
 import courseDetailModel from "../models/courseDetailModel.js";
-
+import mongoose from "mongoose";
 
 
 
@@ -65,17 +65,17 @@ export const getCategories = async (req, res) => {
 export const getCourseById = async (req, res) => {
     try {
         const { id } = req.params
-        const {preview} = req.query
+        const { preview } = req.query
 
         const course = await courseModel.findById(id)
-        .populate({
-            path: 'category',
-            select: 'name -_id'
-        })
-        .populate({
-            path: 'details',
-            select: preview === "true" ? "title type youtubeId text" : "title type"
-        })
+            .populate({
+                path: 'category',
+                select: 'name -_id'
+            })
+            .populate({
+                path: 'details',
+                select: preview === "true" ? "title type youtubeId text" : "title type"
+            })
 
         const imageUrl = process.env.APP_URL + '/uploads/courses/'
 
@@ -259,9 +259,9 @@ export const postContentCourse = async (req, res) => {
             $push: {
                 details: content._id
             }
-        }, {new: true})
+        }, { new: true })
 
-        return res.json({message: 'Create content Success'})
+        return res.json({ message: 'Create content Success' })
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -272,20 +272,20 @@ export const postContentCourse = async (req, res) => {
 
 export const updateContentCourse = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         const body = req.body
         const course = await courseModel.findById(body.courseId)
 
-        await courseDetailModel.findByIdAndUpdate(id,{
+        await courseDetailModel.findByIdAndUpdate(id, {
             title: body.title,
             type: body.type,
             course: course._id,
             text: body.text,
             youtubeId: body.youtubeId
-        }, {new: true})
-        
+        }, { new: true })
 
-        return res.json({message: 'Update content Success'})
+
+        return res.json({ message: 'Update content Success' })
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -296,7 +296,7 @@ export const updateContentCourse = async (req, res) => {
 
 export const deleteContentCourse = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         await courseDetailModel.findByIdAndDelete(id)
         return res.json({
             message: "Delete Content Success"
@@ -312,7 +312,7 @@ export const deleteContentCourse = async (req, res) => {
 
 export const getDetailContent = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         const content = await courseDetailModel.findById(id)
         return res.json({
             message: "Get Detail Content Success",
@@ -328,7 +328,7 @@ export const getDetailContent = async (req, res) => {
 
 export const getStudentsByCourseId = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
 
         const course = await courseModel.findById(id).select('name').populate({
             path: 'students',
@@ -359,37 +359,54 @@ export const getStudentsByCourseId = async (req, res) => {
 }
 
 export const postStudentToCourse = async (req, res) => {
-    try {
-        const {id} = req.params
-        const body = req.body
+  try {
 
-        await userModel.findByIdAndUpdate(body.studentId, {
-            $push: {
-                courses: id
-            }
-        })
+    const { id } = req.params;
+    const { studentId } = req.body;
 
-        await courseModel.findByIdAndUpdate(id, {
-            $push: {
-                students: body.studentId
-            }
-        })
+    console.log("🔍 Course ID:", id);
+    console.log("🔍 Student ID:", studentId);
 
-        return res.json({
-            message: 'Add student to course success'
-        })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: "Internal Server Error"
-        })
+    if (!studentId) {
+      return res.status(400).json({ message: "Student ID is required" });
     }
-}
+
+    if (!mongoose.Types.ObjectId.isValid(studentId)) {
+      return res.status(400).json({ message: "Invalid student studentId format BE CourseController" });
+    }
+    // if (!mongoose.Types.ObjectId.isValid(id)) {
+        
+    //   return res.status(400).json({ message: "Invalid course ID format Ratino" });
+    // }
+
+    
+
+    const studentObjectId = new mongoose.Types.ObjectId(studentId);
+    const courseObjectId = new mongoose.Types.ObjectId(id);
+    console.log("✅ Valid IDs provided.");
+    const user = await userModel.findByIdAndUpdate(studentObjectId, {
+      $addToSet: { courses: courseObjectId }
+    });
+
+    // const course = await courseModel.findByIdAndUpdate(courseObjectId, {
+    //   $addToSet: { students: studentObjectId }
+    // });
+
+    console.log("✅ Updated user:", user);
+    console.log("✅ Updated course:", course);
+
+    return res.json({ message: "Add student to course success" });
+  } catch (error) {
+    console.error("🔥 postStudentToCourse error:", error);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
 
 
 export const deleteStudentToCourse = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         const body = req.body
 
         await userModel.findByIdAndUpdate(body.studentId, {
